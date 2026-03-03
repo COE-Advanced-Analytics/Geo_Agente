@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geo Agent | Inteligencia Geografica Comercial</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg-cream:#FDFBF7;--bg-warm:#F8F5F0;--bg-card:#FFFFFF;--text-primary:#3D3A36;--text-secondary:#4a4a5a;--text-muted:#7a7a8a;--accent-coral:#E85D4C;--accent-coral-dark:#C94A3A;--accent-coral-light:#FFF0EE;--accent-teal:#2D9C9C;--accent-teal-dark:#238080;--accent-teal-light:#E8F6F6;--accent-gold:#D4A853;--accent-gold-dark:#C4983F;--accent-gold-light:#FDF8EC;--accent-purple:#7C5CFC;--accent-purple-light:#F0ECFF;--dark-warm:#3D3A36;--border:#E8E4DD;--shadow-sm:0 2px 8px rgba(26,26,46,0.06);--shadow-md:0 4px 16px rgba(26,26,46,0.10)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:#f0ede8}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-cream);color:var(--text-primary);line-height:1.6}
+.layout{display:flex;min-height:100vh;max-width:1400px;margin:0 auto}
+.sidebar{width:256px;flex-shrink:0;background:var(--bg-card);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;box-shadow:2px 0 12px rgba(0,0,0,.04)}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo-eyebrow{font-family:'Space Grotesk',sans-serif;font-size:8px;font-weight:700;color:var(--accent-coral);letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:5px}
+.sidebar-logo h1{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--text-primary);line-height:1.2}
+.sidebar-logo p{font-size:10px;color:var(--text-muted);margin-top:4px}
+.nav-group{padding:10px 0 4px}
+.nav-group-label{font-family:'Space Grotesk',sans-serif;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:6px 18px 3px;display:block}
+.nav-link{display:flex;align-items:center;gap:8px;padding:5px 18px;text-decoration:none;color:var(--text-muted);font-size:11.5px;font-weight:500;transition:all .15s;border-left:2px solid transparent;cursor:pointer}
+.nav-link:hover{color:var(--text-primary);background:var(--bg-warm)}
+.nav-link.active{color:var(--accent-coral);border-left-color:var(--accent-coral);background:var(--accent-coral-light)}
+.nav-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.main{flex:1;padding:0 48px 80px;overflow:hidden}
+.hero{background:linear-gradient(135deg,var(--bg-warm) 0%,var(--bg-cream) 100%);border-radius:0 0 20px 20px;padding:36px 48px 32px;margin:0 -48px 32px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;bottom:-60px;right:-30px;width:300px;height:300px;background:radial-gradient(circle,var(--accent-coral-light) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.hero::after{content:'';position:absolute;top:-40px;left:30%;width:200px;height:200px;background:radial-gradient(circle,var(--accent-teal-light) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.hero-inner{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border);padding:4px 12px;border-radius:100px;font-family:'Space Grotesk',sans-serif;font-size:9px;font-weight:700;color:var(--accent-coral);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.hero-badge-dot{width:6px;height:6px;background:var(--accent-coral);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;line-height:1.15;color:var(--text-primary);margin-bottom:8px}
+.hero h1 .hl{color:var(--accent-coral)}
+.hero p.hero-desc{font-size:13px;color:var(--text-muted);max-width:600px;line-height:1.7;margin-bottom:22px}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat-num{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;line-height:1}
+.stat-label{font-size:10px;color:var(--text-muted);margin-top:2px}
+.area-logo{position:absolute;top:20px;right:48px;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.78);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:100px;padding:6px 14px 6px 8px;box-shadow:var(--shadow-sm);z-index:2}
+.area-logo svg{width:26px;height:26px;flex-shrink:0}
+.area-logo-name{font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:700;color:var(--text-primary);line-height:1.2}
+.section{padding-top:48px;border-bottom:1px solid var(--border);padding-bottom:40px}
+.section:last-child{border-bottom:none}
+.section-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.section-num{font-family:'Space Grotesk',sans-serif;font-size:9px;font-weight:700;color:var(--text-muted);padding-top:6px;min-width:24px;flex-shrink:0}
+.section-tag{font-family:'Space Grotesk',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.section h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--text-primary);line-height:1.25}
+.section h3{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--text-primary);margin:28px 0 10px}
+.section p{font-size:12.5px;color:var(--text-secondary);margin-bottom:12px;max-width:820px;line-height:1.8}
+.section p strong{color:var(--text-primary)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow-sm);transition:all .2s}
+.card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.card-icon{font-size:18px;margin-bottom:9px}
+.card h4{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--text-primary);margin:0 0 6px}
+.card p{font-size:11px;color:var(--text-muted);margin:0;line-height:1.55}
+.card-top-coral{border-top:3px solid var(--accent-coral)}
+.card-top-teal{border-top:3px solid var(--accent-teal)}
+.card-top-gold{border-top:3px solid var(--accent-gold)}
+.card-top-purple{border-top:3px solid var(--accent-purple)}
+.tbl-wrap{overflow-x:auto;margin:12px 0 24px;border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg-card)}
+th{font-family:'Space Grotesk',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg-warm);white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid rgba(232,228,221,.5);color:var(--text-secondary);vertical-align:middle;line-height:1.4}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg-warm)}
+.badge{display:inline-block;font-family:'Space Grotesk',sans-serif;font-size:8px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.3px;white-space:nowrap}
+.bg{background:var(--accent-teal-light);color:var(--accent-teal-dark)}
+.bo{background:var(--accent-coral-light);color:var(--accent-coral)}
+.bp{background:var(--accent-gold-light);color:var(--accent-gold-dark)}
+.bpu{background:var(--accent-purple-light);color:var(--accent-purple)}
+.bbl{background:#e3f2fd;color:#1565c0}
+.takeaway{background:linear-gradient(135deg,var(--dark-warm) 0%,#2a2a3e 100%);border-radius:12px;padding:14px 18px;margin:14px 0 20px;display:flex;align-items:center;gap:14px;max-width:820px}
+.takeaway-icon{font-size:22px;flex-shrink:0}
+.takeaway p{font-size:12px;color:rgba(255,255,255,.8);line-height:1.65;margin:0}
+.takeaway p strong{color:var(--accent-gold)}
+ul.prose-list{max-width:820px;list-style:none;padding:0;margin-bottom:12px}
+ul.prose-list li{padding:4px 0;color:var(--text-secondary);font-size:12px;display:flex;gap:8px;line-height:1.6}
+ul.prose-list li::before{content:'\203A';color:var(--accent-coral);flex-shrink:0;font-weight:700}
+.persona-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.persona-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow-sm);transition:all .2s}
+.persona-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.persona-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.persona-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.persona-name{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--text-primary)}
+.persona-role{font-size:10px;color:var(--text-muted)}
+.persona-desc{font-size:11.5px;color:var(--text-secondary);line-height:1.7;margin-bottom:12px}
+.pain{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--bg-warm);border-radius:8px;margin-bottom:6px;font-size:11px;color:var(--text-secondary);line-height:1.5}
+.pain-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.not-for{display:inline-flex;align-items:center;gap:8px;background:var(--bg-warm);border:1px solid var(--border);padding:8px 16px;border-radius:100px;font-size:11px;color:var(--text-muted);margin:16px 0}
+.usecase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.usecase-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow-sm);transition:all .2s}
+.usecase-card:hover{box-shadow:var(--shadow-md);border-color:var(--accent-coral);transform:translateY(-2px)}
+.usecase-icon{font-size:24px;margin-bottom:8px}
+.usecase-title{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
+.usecase-text{font-size:10px;color:var(--text-muted);line-height:1.55}
+.seg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:14px 0}
+.seg-item{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
+.seg-icon{font-size:20px;margin-bottom:6px}
+.seg-name{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:var(--text-primary)}
+.seg-desc{font-size:9px;color:var(--text-muted);margin-top:3px}
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.visit-item{display:flex;gap:12px;padding:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm)}
+.visit-icon{font-size:18px;flex-shrink:0;padding-top:2px}
+.visit-item h4{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.visit-item p{font-size:11px;color:var(--text-muted);line-height:1.55;margin:0}
+.opp-list{margin:14px 0}
+.opp-item{display:flex;gap:14px;margin-bottom:14px;padding:16px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-sm);transition:all .2s}
+.opp-item:hover{box-shadow:var(--shadow-md);transform:translateX(4px)}
+.opp-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.opp-content{flex:1}
+.opp-content h4{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:5px}
+.opp-content p{font-size:11px;color:var(--text-secondary);line-height:1.7;margin:0 0 8px}
+.opp-tag{display:inline-block;font-family:'Space Grotesk',sans-serif;font-size:8px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.3px;margin-right:4px}
+.tag-ai{background:var(--accent-purple-light);color:var(--accent-purple)}
+.tag-action{background:var(--accent-gold-light);color:var(--accent-gold-dark)}
+.tag-data{background:var(--accent-teal-light);color:var(--accent-teal-dark)}
+.tag-layer{background:var(--accent-coral-light);color:var(--accent-coral)}
+.arch-flow{display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0;flex-wrap:wrap}
+.arch-box{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;text-align:center;box-shadow:var(--shadow-sm);min-width:120px}
+.arch-box.hl{background:var(--dark-warm);color:#fff;border-color:var(--dark-warm)}
+.arch-box .ab-icon{font-size:20px;margin-bottom:4px}
+.arch-box .ab-label{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700}
+.arch-arrow{font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--accent-coral);font-weight:700}
+.stack-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stack-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
+.stack-card .sc-icon{font-size:20px;margin-bottom:6px}
+.stack-card h4{font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.stack-card p{font-size:10px;color:var(--text-muted);margin:0;line-height:1.4}
+@media(max-width:900px){.sidebar{display:none}.main{padding:24px 20px 60px}.persona-grid,.visit-grid{grid-template-columns:1fr}.usecase-grid,.stack-grid{grid-template-columns:1fr 1fr}.seg-grid{grid-template-columns:repeat(3,1fr)}.area-logo{right:16px;top:14px}}
+@media print{.sidebar{display:none}.main{padding:20px}.section{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-eyebrow">&#9656; COE Advanced Analytics</span>
+    <h1>Geo Agent</h1>
+    <p>Inteligencia Geografica Comercial</p>
+  </div>
+  <div class="nav-group"><span class="nav-group-label">Producto</span>
+    <a href="#que-es" class="nav-link active"><span class="nav-dot" style="background:var(--accent-coral)"></span>&#x1F5FA;&#xFE0F; Que es Geo Agent?</a>
+    <a href="#para-quien" class="nav-link"><span class="nav-dot" style="background:var(--accent-teal)"></span>&#x1F465; Publico Objetivo</a></div>
+  <div class="nav-group"><span class="nav-group-label">Capacidades</span>
+    <a href="#funcionalidades" class="nav-link"><span class="nav-dot" style="background:var(--accent-coral)"></span>Funcionalidades</a>
+    <a href="#informacion" class="nav-link"><span class="nav-dot" style="background:var(--accent-gold)"></span>Informacion disponible</a>
+    <a href="#segmentacion" class="nav-link"><span class="nav-dot" style="background:var(--accent-teal)"></span>Segmentacion visual</a>
+    <a href="#visitas" class="nav-link"><span class="nav-dot" style="background:var(--accent-coral)"></span>Estados de visita</a></div>
+  <div class="nav-group"><span class="nav-group-label">Evolucion</span>
+    <a href="#oportunidades" class="nav-link"><span class="nav-dot" style="background:var(--accent-purple)"></span>&#x1F680; Oportunidades</a></div>
+  <div class="nav-group"><span class="nav-group-label">Tecnico</span>
+    <a href="#arquitectura" class="nav-link"><span class="nav-dot" style="background:var(--accent-gold)"></span>Arquitectura</a></div>
+</nav>
+<div class="main">
+<div class="hero">
+  <div class="area-logo">
+    <svg viewBox="0 0 40 40" fill="none">
+      <rect width="40" height="40" rx="10" fill="url(#lgCOE)"/>
+      <circle cx="12" cy="15" r="3" fill="white"/>
+      <circle cx="12" cy="20" r="3" fill="white"/>
+      <circle cx="12" cy="25" r="3" fill="white"/>
+      <circle cx="20" cy="17" r="3" fill="white" fill-opacity="0.7"/>
+      <circle cx="20" cy="23" r="3" fill="white" fill-opacity="0.7"/>
+      <circle cx="28" cy="20" r="4" fill="#D4A853"/>
+      <defs><linearGradient id="lgCOE" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#E85D4C"/><stop offset="1" stop-color="#C94A3A"/></linearGradient></defs>
+    </svg>
+    <div class="area-logo-name">COE Advanced Analytics</div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>ALICORP &middot; TRANSFORMACION DIGITAL &middot; 2025</div>
+    <h1>&#x1F5FA;&#xFE0F; <span class="hl">Geo Agent</span><br>Inteligencia Geografica Comercial</h1>
+    <p class="hero-desc">Aplicacion web que visualiza la cartera de clientes sobre un mapa interactivo con datos de negocio en tiempo real: segmentacion, ventas, visitas, clasificacion del PDV y mas.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" style="color:var(--accent-coral)">360&#176;</span><span class="stat-label">Vista del cliente</span></div>
+      <div class="stat"><span class="stat-num" style="color:var(--accent-teal)">Real-time</span><span class="stat-label">Datos integrados</span></div>
+      <div class="stat"><span class="stat-num" style="color:var(--accent-gold-dark)">Google Maps</span><span class="stat-label">Interfaz interactiva</span></div>
+      <div class="stat"><span class="stat-num" style="color:var(--accent-coral)">BigQuery</span><span class="stat-label">Motor de datos</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 01 Que es -->
+<section class="section" id="que-es">
+  <div class="section-header"><span class="section-num">01</span><div>
+    <div class="section-tag" style="color:var(--accent-coral)">&#9656; PRODUCTO</div>
+    <h2>&iquest;Qu&eacute; es Geo Agent?</h2></div></div>
+
+  <p><strong>Geo Agent</strong> es una aplicaci&oacute;n web que transforma la gesti&oacute;n comercial en terreno, permitiendo visualizar la cartera de clientes sobre un mapa interactivo con informaci&oacute;n de negocio integrada en tiempo real.</p>
+
+  <p>Consolida datos de m&uacute;ltiples fuentes para entregar una <strong>vista 360&deg; del cliente</strong>:</p>
+
+  <ul class="prose-list">
+    <li><strong>Ubicaci&oacute;n exacta</strong> de clientes en el mapa con coordenadas reales</li>
+    <li><strong>Segmentaci&oacute;n comercial</strong> &mdash; Transaccional, Estrat&eacute;gica y Potencial</li>
+    <li><strong>Ventas &uacute;ltimos 3 meses</strong> con montos y % venta d&iacute;a a d&iacute;a</li>
+    <li><strong>Frecuencia programada</strong> de visitas por territorio</li>
+    <li><strong>Estado de visitas</strong> del equipo de ventas (tracking GPS)</li>
+    <li><strong>Clasificaci&oacute;n visual</strong> del punto de venta (checkpoint)</li>
+  </ul>
+
+  <div class="takeaway"><span class="takeaway-icon">&#x1F5FA;&#xFE0F;</span>
+    <p>Geo Agent unifica toda la informaci&oacute;n comercial del PDV en <strong>una sola interfaz geogr&aacute;fica</strong>, eliminando la necesidad de consultar m&uacute;ltiples reportes est&aacute;ticos.</p></div>
+</section>
+
+<!-- 02 Publico Objetivo -->
+<section class="section" id="para-quien">
+  <div class="section-header"><span class="section-num">02</span><div>
+    <div class="section-tag" style="color:var(--accent-teal)">&#9656; P&Uacute;BLICO OBJETIVO</div>
+    <h2>&iquest;Para qui&eacute;n es Geo Agent?</h2></div></div>
+
+  <p>Dise&ntilde;ado para quienes toman <strong>decisiones sobre la operaci&oacute;n comercial</strong>, no para quienes la ejecutan en calle.</p>
+
+  <div class="persona-grid">
+    <div class="persona-card" style="border-top:3px solid var(--accent-coral)">
+      <div class="persona-top">
+        <div class="persona-avatar" style="background:linear-gradient(135deg,#E85D4C,#C94A3A);color:#fff;">&#x1F468;&#x200D;&#x1F4BC;</div>
+        <div><div class="persona-name">Jefe Comercial de Campo (JCC)</div><div class="persona-role">Supervisi&oacute;n estrat&eacute;gica de zona</div></div>
+      </div>
+      <div class="persona-desc">Necesita visibilidad geogr&aacute;fica de su cartera para tomar decisiones sobre cobertura, priorizaci&oacute;n y seguimiento de su equipo.</div>
+      <div class="pain"><span class="pain-icon">&#x1F50E;</span><span>Supervisar visitas sin recorrer toda la zona f&iacute;sicamente</span></div>
+      <div class="pain"><span class="pain-icon">&#x1F4CA;</span><span>Identificar clientes desatendidos o con ca&iacute;da en ventas</span></div>
+      <div class="pain"><span class="pain-icon">&#x1F5FA;&#xFE0F;</span><span>Planificar rutas y redistribuir territorios con datos reales</span></div>
+    </div>
+    <div class="persona-card" style="border-top:3px solid var(--accent-teal)">
+      <div class="persona-top">
+        <div class="persona-avatar" style="background:linear-gradient(135deg,#2D9C9C,#238080);color:#fff;">&#x1F469;&#x200D;&#x1F4BB;</div>
+        <div><div class="persona-name">Equipo Comercial / Analistas</div><div class="persona-role">Soporte y planificaci&oacute;n t&aacute;ctica</div></div>
+      </div>
+      <div class="persona-desc">Requiere una herramienta &aacute;gil para analizar la distribuci&oacute;n de clientes, segmentos y oportunidades antes de definir acciones t&aacute;cticas.</div>
+      <div class="pain"><span class="pain-icon">&#x1F3AF;</span><span>Segmentar geogr&aacute;ficamente para campa&ntilde;as y empujes t&aacute;cticos</span></div>
+      <div class="pain"><span class="pain-icon">&#x1F4C8;</span><span>Cruzar venta hist&oacute;rica con ubicaci&oacute;n para detectar potencial</span></div>
+      <div class="pain"><span class="pain-icon">&#x26A1;</span><span>Consultar informaci&oacute;n sin depender de reportes est&aacute;ticos</span></div>
+    </div>
+  </div>
+
+  <div class="not-for">&#x1F4F1; <strong>Los vendedores en calle ya cuentan con NITRO</strong> como herramienta de ejecuci&oacute;n diaria. Geo Agent complementa la visi&oacute;n estrat&eacute;gica desde escritorio.</div>
+
+  <h3>Casos de uso concretos</h3>
+  <div class="usecase-grid">
+    <div class="usecase-card">
+      <div class="usecase-icon">&#x1F50D;</div>
+      <div class="usecase-title">Revisi&oacute;n de Cartera</div>
+      <div class="usecase-text">El JCC revisa qu&eacute; clientes Oro+ no han sido visitados en su zona y prioriza la semana siguiente.</div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">&#x1F4C9;</div>
+      <div class="usecase-title">Alertas de Venta</div>
+      <div class="usecase-text">El analista filtra clientes activos sin ventas en 2 meses para armar un plan de recuperaci&oacute;n por distrito.</div>
+    </div>
+    <div class="usecase-card">
+      <div class="usecase-icon">&#x1F5FA;&#xFE0F;</div>
+      <div class="usecase-title">Planificaci&oacute;n Territorial</div>
+      <div class="usecase-text">El equipo comercial analiza la concentraci&oacute;n de clientes por boca de salida para reasignar territorios.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 Funcionalidades -->
+<section class="section" id="funcionalidades">
+  <div class="section-header"><span class="section-num">03</span><div>
+    <div class="section-tag" style="color:var(--accent-coral)">&#9656; CAPACIDADES</div>
+    <h2>Funcionalidades Principales</h2></div></div>
+
+  <p>Herramientas dise&ntilde;adas para optimizar la gesti&oacute;n comercial desde una interfaz geogr&aacute;fica &uacute;nica.</p>
+
+  <div class="card-grid">
+    <div class="card card-top-coral">
+      <div class="card-icon">&#x1F50D;</div>
+      <h4>B&uacute;squeda por ID</h4>
+      <p>Busca uno o varios clientes ingresando sus c&oacute;digos separados por coma. Muestra ubicaci&oacute;n exacta y toda la info asociada.</p>
+    </div>
+    <div class="card card-top-teal">
+      <div class="card-icon">&#x1F3AF;</div>
+      <h4>Filtros Avanzados</h4>
+      <p>Filtra por Boca de Salida, Seg. Transaccional, Estrat&eacute;gica, Potencial, estado activo/inactivo y ubicaci&oacute;n.</p>
+    </div>
+    <div class="card card-top-gold">
+      <div class="card-icon">&#x1F4CD;</div>
+      <h4>Geolocalizaci&oacute;n</h4>
+      <p>Obt&eacute;n tu ubicaci&oacute;n actual con un clic y encuentra los clientes m&aacute;s cercanos ordenados por distancia.</p>
+    </div>
+    <div class="card card-top-coral">
+      <div class="card-icon">&#x1F4B0;</div>
+      <h4>Ventas 3 Meses</h4>
+      <p>Historial de ventas por mes con montos totales, % venta d&iacute;a a d&iacute;a y detecci&oacute;n de meses sin venta.</p>
+    </div>
+    <div class="card card-top-teal">
+      <div class="card-icon">&#x1F4C5;</div>
+      <h4>Frecuencia de Visitas</h4>
+      <p>Programaci&oacute;n de visitas por territorio: Semanal, Quincenal o Mensual con d&iacute;as asignados y FdV.</p>
+    </div>
+    <div class="card card-top-gold">
+      <div class="card-icon">&#x2705;</div>
+      <h4>Tracking de Visitas</h4>
+      <p>Estado de visitas del equipo: Visitado (&le;25m), Posible Visita (&le;50m), con fecha de &uacute;ltima visita.</p>
+    </div>
+    <div class="card card-top-purple">
+      <div class="card-icon">&#x1F3EA;</div>
+      <h4>Clasificaci&oacute;n PDV</h4>
+      <p>Clasificaci&oacute;n visual: bodega chica, mediana, minimarket o cerrada, basada en im&aacute;genes de checkpoint.</p>
+    </div>
+    <div class="card card-top-coral">
+      <div class="card-icon">&#x1F4CC;</div>
+      <h4>Puntos Manuales</h4>
+      <p>Agrega puntos de referencia en el mapa haciendo clic para marcar zonas de inter&eacute;s o puntos de encuentro.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 Informacion -->
+<section class="section" id="informacion">
+  <div class="section-header"><span class="section-num">04</span><div>
+    <div class="section-tag" style="color:var(--accent-gold)">&#9656; DATOS INTEGRADOS</div>
+    <h2>Informaci&oacute;n Disponible</h2></div></div>
+
+  <p>Datos integrados de m&uacute;ltiples fuentes para una <strong>vista 360&deg; del cliente</strong>.</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Campo</th><th>Descripci&oacute;n</th><th>Fuente</th><th>Tipo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ID Cliente</strong></td><td>C&oacute;digo &uacute;nico del interlocutor comercial</td><td>dex_cliente</td><td><span class="badge bbl">Identificador</span></td></tr>
+      <tr><td><strong>Nombre</strong></td><td>Raz&oacute;n social o nombre del cliente</td><td>dex_cliente</td><td><span class="badge bbl">Identificador</span></td></tr>
+      <tr><td><strong>Coordenadas</strong></td><td>Latitud y Longitud para ubicaci&oacute;n en mapa</td><td>dex_cliente</td><td><span class="badge bg">Geogr&aacute;fico</span></td></tr>
+      <tr><td><strong>Seg. Transaccional</strong></td><td>Clasificaci&oacute;n: Oro+, Oro, Plata, Bronce, Otros</td><td>cr_segmentacion</td><td><span class="badge bpu">Segmentaci&oacute;n</span></td></tr>
+      <tr><td><strong>Seg. Estrat&eacute;gica</strong></td><td>Subsegmento estrat&eacute;gico del cliente</td><td>cr_segmentacion</td><td><span class="badge bpu">Segmentaci&oacute;n</span></td></tr>
+      <tr><td><strong>Seg. Potencial</strong></td><td>Potencial comercial: P o NP</td><td>cr_segmentacion</td><td><span class="badge bpu">Segmentaci&oacute;n</span></td></tr>
+      <tr><td><strong>Estado</strong></td><td>Estado del cliente: Activo o Inactivo</td><td>dex_cliente</td><td><span class="badge bbl">Identificador</span></td></tr>
+      <tr><td><strong>Boca de Salida</strong></td><td>Canal: Bodega, Panader&iacute;a, Minimarket, etc.</td><td>dex_cliente</td><td><span class="badge bbl">Identificador</span></td></tr>
+      <tr><td><strong>Distrito / Provincia</strong></td><td>Ubicaci&oacute;n administrativa del cliente</td><td>dex_cliente</td><td><span class="badge bg">Geogr&aacute;fico</span></td></tr>
+      <tr><td><strong>Ventas 3 Meses</strong></td><td>Monto total y % venta d&iacute;a a d&iacute;a por cada uno de los &uacute;ltimos 3 meses</td><td>dex_cliente_detalle</td><td><span class="badge bo">Comercial</span></td></tr>
+      <tr><td><strong>Clasificaci&oacute;n PDV</strong></td><td>Tipo de PDV: bodega chica, mediana, minimarket, cerrada</td><td>df_checkpoint_fotos</td><td><span class="badge bo">Comercial</span></td></tr>
+      <tr><td><strong>Territorio</strong></td><td>C&oacute;digo de territorio asignado (6 d&iacute;gitos)</td><td>dex_interlocutor_territorio</td><td><span class="badge bp">Operativo</span></td></tr>
+      <tr><td><strong>Fuerza de Venta</strong></td><td>Canal de atenci&oacute;n: BODEG, INPU, CLEAN, etc.</td><td>dex_personal_territorio</td><td><span class="badge bp">Operativo</span></td></tr>
+      <tr><td><strong>Frecuencia Visita</strong></td><td>Programaci&oacute;n: Semanal, Quincenal, Mensual + d&iacute;as</td><td>dex_interlocutor_territorio</td><td><span class="badge bp">Operativo</span></td></tr>
+      <tr><td><strong>Estado Visita</strong></td><td>Visitado, Posible Visita o Sin Visitas (&uacute;ltimos 30 d&iacute;as)</td><td>tracking (NITRO)</td><td><span class="badge bg">Tracking</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 Segmentacion -->
+<section class="section" id="segmentacion">
+  <div class="section-header"><span class="section-num">05</span><div>
+    <div class="section-tag" style="color:var(--accent-teal)">&#9656; VISUAL</div>
+    <h2>Segmentaci&oacute;n Visual en el Mapa</h2></div></div>
+
+  <p>Los marcadores se diferencian por color seg&uacute;n la <strong>segmentaci&oacute;n transaccional</strong> del cliente.</p>
+
+  <div class="seg-grid">
+    <div class="seg-item" style="border-top:3px solid #FFD700">
+      <div class="seg-icon">&#x1F451;</div>
+      <div class="seg-name">Oro+</div>
+      <div class="seg-desc">Mayor valor comercial</div>
+    </div>
+    <div class="seg-item" style="border-top:3px solid #FFA500">
+      <div class="seg-icon">&#x2B50;</div>
+      <div class="seg-name">Oro</div>
+      <div class="seg-desc">Alto valor</div>
+    </div>
+    <div class="seg-item" style="border-top:3px solid #C0C0C0">
+      <div class="seg-icon">&#x1F48E;</div>
+      <div class="seg-name">Plata</div>
+      <div class="seg-desc">Valor medio-alto</div>
+    </div>
+    <div class="seg-item" style="border-top:3px solid #CD7F32">
+      <div class="seg-icon">&#x1F949;</div>
+      <div class="seg-name">Bronce</div>
+      <div class="seg-desc">Valor medio</div>
+    </div>
+    <div class="seg-item" style="border-top:3px solid #607D8B">
+      <div class="seg-icon">&#x1F4CD;</div>
+      <div class="seg-name">Otros</div>
+      <div class="seg-desc">Sin segmentaci&oacute;n</div>
+    </div>
+    <div class="seg-item" style="border-top:3px solid #4CAF50">
+      <div class="seg-icon">&#x1F3AF;</div>
+      <div class="seg-name">Tu Ubicaci&oacute;n</div>
+      <div class="seg-desc">Posici&oacute;n actual</div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 Estados de Visita -->
+<section class="section" id="visitas">
+  <div class="section-header"><span class="section-num">06</span><div>
+    <div class="section-tag" style="color:var(--accent-coral)">&#9656; TRACKING</div>
+    <h2>Estados de Visita</h2></div></div>
+
+  <p>C&oacute;mo se determina el estado de visita del cliente seg&uacute;n la <strong>distancia GPS del vendedor</strong>.</p>
+
+  <div class="visit-grid">
+    <div class="visit-item" style="border-left:3px solid var(--accent-teal)">
+      <div class="visit-icon">&#x2705;</div>
+      <div><h4>Visitado</h4><p>El vendedor estuvo a <strong>25 metros o menos</strong> del cliente. Se registra la fecha de la visita m&aacute;s reciente en los &uacute;ltimos 30 d&iacute;as.</p></div>
+    </div>
+    <div class="visit-item" style="border-left:3px solid var(--accent-gold)">
+      <div class="visit-icon">&#x1F7E1;</div>
+      <div><h4>Posible Visita</h4><p>El vendedor estuvo a <strong>entre 25 y 50 metros</strong> del cliente. Indica una visita probable pero no confirmada.</p></div>
+    </div>
+    <div class="visit-item" style="border-left:3px solid var(--accent-coral)">
+      <div class="visit-icon">&#x1F4ED;</div>
+      <div><h4>Sin Visitas</h4><p>No se registr&oacute; ninguna visita del vendedor asignado dentro del rango de <strong>50 metros</strong> en los &uacute;ltimos 30 d&iacute;as.</p></div>
+    </div>
+    <div class="visit-item" style="border-left:3px solid var(--accent-purple)">
+      <div class="visit-icon">&#x1F5FA;&#xFE0F;</div>
+      <div><h4>Por Territorio</h4><p>Un cliente puede tener m&uacute;ltiples territorios asignados. Se muestra el estado de visita <strong>por cada territorio</strong> con su respectiva fuerza de venta.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 Oportunidades -->
+<section class="section" id="oportunidades">
+  <div class="section-header"><span class="section-num">07</span><div>
+    <div class="section-tag" style="color:var(--accent-purple)">&#9656; EVOLUCI&Oacute;N</div>
+    <h2>Oportunidades de Evoluci&oacute;n</h2></div></div>
+
+  <p>Informaci&oacute;n adicional que se puede integrar para <strong>potenciar la toma de decisiones comerciales</strong>.</p>
+
+  <div class="opp-list">
+    <div class="opp-item">
+      <div class="opp-dot" style="background:var(--accent-purple-light)">&#x1F52D;</div>
+      <div class="opp-content">
+        <h4>Prospecci&oacute;n de Clientes</h4>
+        <p>Identificar zonas con alta concentraci&oacute;n de clientes potenciales y baja cobertura actual. Visualizar en el mapa los prospectos generados por modelos anal&iacute;ticos o data externa, permitiendo al JCC priorizar qu&eacute; nuevos puntos atacar seg&uacute;n su ubicaci&oacute;n relativa a la cartera actual.</p>
+        <span class="opp-tag tag-ai">Modelo Anal&iacute;tico</span>
+      </div>
+    </div>
+    <div class="opp-item">
+      <div class="opp-dot" style="background:var(--accent-gold-light)">&#x26A0;&#xFE0F;</div>
+      <div class="opp-content">
+        <h4>Churn de Clientes</h4>
+        <p>Superponer alertas de riesgo de fuga sobre el mapa. Los clientes con probabilidad alta de churn se destacar&iacute;an visualmente, permitiendo que el equipo comercial priorice acciones de retenci&oacute;n sobre clientes estrat&eacute;gicos antes de perderlos.</p>
+        <span class="opp-tag tag-ai">Modelo Anal&iacute;tico</span>
+        <span class="opp-tag tag-action">Acci&oacute;n T&aacute;ctica</span>
+      </div>
+    </div>
+    <div class="opp-item">
+      <div class="opp-dot" style="background:var(--accent-coral-light)">&#x1F321;&#xFE0F;</div>
+      <div class="opp-content">
+        <h4>Riesgo Comercial: Clientes Fr&iacute;os vs Activos</h4>
+        <p>Clasificar visualmente a los clientes seg&uacute;n su actividad reciente: calientes (compran frecuentemente), tibios (compras espor&aacute;dicas) y fr&iacute;os (sin compras recientes). Detectar r&aacute;pidamente zonas con alta concentraci&oacute;n de clientes en riesgo de inactividad.</p>
+        <span class="opp-tag tag-data">Data Interna</span>
+        <span class="opp-tag tag-action">Acci&oacute;n T&aacute;ctica</span>
+      </div>
+    </div>
+    <div class="opp-item">
+      <div class="opp-dot" style="background:var(--accent-teal-light)">&#x1F30D;</div>
+      <div class="opp-content">
+        <h4>Capas Externas al Mapa</h4>
+        <p>Enriquecer el mapa con informaci&oacute;n contextual: <strong>densidad poblacional</strong> para priorizar zonas de mayor tr&aacute;fico, <strong>tipo de zona</strong> (comercial, residencial, mixta) para entender el entorno del PDV, y <strong>saturaci&oacute;n de clientes similares</strong> para evaluar la competitividad de cada cuadra.</p>
+        <span class="opp-tag tag-layer">Capa Geogr&aacute;fica</span>
+        <span class="opp-tag tag-data">Data Externa</span>
+      </div>
+    </div>
+    <div class="opp-item">
+      <div class="opp-dot" style="background:var(--accent-gold-light)">&#x1F680;</div>
+      <div class="opp-content">
+        <h4>Iniciativas y Empujes T&aacute;cticos</h4>
+        <p>Mostrar en el mapa si un cliente tiene una iniciativa comercial activa (promoci&oacute;n, lanzamiento, activaci&oacute;n especial). Verificar que las iniciativas se est&eacute;n ejecutando en terreno e identificar qu&eacute; clientes a&uacute;n no han sido alcanzados por un empuje t&aacute;ctico vigente.</p>
+        <span class="opp-tag tag-action">Acci&oacute;n T&aacute;ctica</span>
+        <span class="opp-tag tag-data">Data Interna</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="takeaway"><span class="takeaway-icon">&#x1F680;</span>
+    <p>Cada oportunidad suma una <strong>capa de inteligencia</strong> al mapa, transformando Geo Agent de herramienta de consulta a <strong>plataforma de decisi&oacute;n comercial</strong>.</p></div>
+</section>
+
+<!-- 08 Arquitectura -->
+<section class="section" id="arquitectura">
+  <div class="section-header"><span class="section-num">08</span><div>
+    <div class="section-tag" style="color:var(--accent-gold)">&#9656; T&Eacute;CNICO</div>
+    <h2>Arquitectura T&eacute;cnica</h2></div></div>
+
+  <p>Stack tecnol&oacute;gico de la soluci&oacute;n.</p>
+
+  <div class="arch-flow">
+    <div class="arch-box"><div class="ab-icon">&#x1F464;</div><div class="ab-label">Usuario</div></div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box hl"><div class="ab-icon">&#x26A1;</div><div class="ab-label" style="color:#fff">Google Apps Script</div></div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box"><div class="ab-icon">&#x1F5C4;&#xFE0F;</div><div class="ab-label">BigQuery</div></div>
+    <div class="arch-arrow">&rarr;</div>
+    <div class="arch-box"><div class="ab-icon">&#x1F5FA;&#xFE0F;</div><div class="ab-label">Google Maps API</div></div>
+  </div>
+
+  <div class="stack-grid">
+    <div class="stack-card" style="border-top:3px solid var(--accent-coral)">
+      <div class="sc-icon">&#x1F310;</div>
+      <h4>Frontend</h4>
+      <p>HTML, CSS, JavaScript con Google Maps</p>
+    </div>
+    <div class="stack-card" style="border-top:3px solid var(--accent-teal)">
+      <div class="sc-icon">&#x2699;&#xFE0F;</div>
+      <h4>Backend</h4>
+      <p>Google Apps Script (Code.gs)</p>
+    </div>
+    <div class="stack-card" style="border-top:3px solid var(--accent-gold)">
+      <div class="sc-icon">&#x1F5C4;&#xFE0F;</div>
+      <h4>Base de Datos</h4>
+      <p>BigQuery &mdash; Data Lake Alicorp</p>
+    </div>
+    <div class="stack-card" style="border-top:3px solid var(--accent-purple)">
+      <div class="sc-icon">&#x1F510;</div>
+      <h4>Seguridad</h4>
+      <p>Autenticaci&oacute;n por correo y contrase&ntilde;a corporativa</p>
+    </div>
+  </div>
+</section>
+
+</div></div></body></html>
